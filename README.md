@@ -5,7 +5,7 @@ The code within this repository comes with no guarantee, the use of this code is
 
 I take NO responsibility and/or liability for how you choose to use information available here. By using any of the files available in this repository, you understand that you are AGREEING TO USE AT YOUR OWN RISK.
 
-# Setup steps
+# Sensor setup
 
 1. Add sensor (/config/configuration.yaml)
 
