@@ -9,21 +9,20 @@ I take NO responsibility and/or liability for how you choose to use information 
 
 1. Add sensor (/config/configuration.yaml)
 
-Replace `{{ EVEUS_IP }}` with your IP, as well as `{{ EVEUS_USER }}` and `{{ EVEUS_PASSWORD }}`.
+Replace `{{ EVSE_HOST }}` with your IP, as well as `{{ EVSE_USER }}` and `{{ EVSE_PASSWORD }}`.
 
 Note: ttribute names are based on eveus pro v1.30. You may check full list of attributes with command:
 ```
-curl -u {{ EVEUS_USER }}:{{ EVEUS_PASSWORD }} -X POST http://{{ EVEUS_IP }}/main
+curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST http://{{ EVSE_HOST }}/main
 ```
 Add sensor to HA (edit /config/configuration.yaml):
 ```
 sensor:
   - platform: rest
-    name: EVSE ES
-    resource: http://{{ EVEUS_IP }}/main
-    username: {{ EVEUS_USER }}
-    password: {{ EVEUS_PASSWORD }}
-    authentication: basic
+    name: EVSE Eveus
+    resource: http://{{ EVSE_HOST }}/main
+    username: {{ EVSE_USER }}
+    password: {{ EVSE_PASSWORD }}
     method: POST
     json_attributes:
       - evseEnabled
@@ -71,70 +70,73 @@ sensor:
       - vBat
       - powerMeas
       - STA_IP_Addres
-    value_template: "EVSE_ES"
+    value_template: "EVSE_Eveus"
   - platform: template
     sensors:
-      evse_es_enabled:
-        value_template: "{{ state_attr('sensor.evse_es', 'evseEnabled') }}"
+      evse_eveus_enabled:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'evseEnabled') }}"
         friendly_name: "EVSE Enabled"
-      evse_es_state:
-        value_template: "{{ state_attr('sensor.evse_es', 'state') }}"
+      evse_eveus_state:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'state') }}"
         friendly_name: "State"
-      evse_es_currentset:
-        value_template: "{{ state_attr('sensor.evse_es', 'currentSet') }}"
+      evse_eveus_currentset:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'currentSet') }}"
         friendly_name: "Current set"
         unit_of_measurement: "A"
-      evse_es_curdesign:
-        value_template: "{{ state_attr('sensor.evse_es', 'curDesign') }}"
+      evse_eveus_curdesign:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'curDesign') }}"
         unit_of_measurement: "A"
         friendly_name: "Current designed"
-      evse_es_voltmeas1:
-        value_template: "{{ state_attr('sensor.evse_es', 'voltMeas1') | round(1) }}"
+      evse_eveus_voltmeas1:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'voltMeas1') | round(1) }}"
         unit_of_measurement: "V"
         friendly_name: "Voltage"
-      evse_es_curmeas1:
-        value_template: "{{ state_attr('sensor.evse_es', 'curMeas1')  | round(1) }}"
+      evse_eveus_curmeas1:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'curMeas1')  | round(1) }}"
         unit_of_measurement: "A"
         friendly_name: "Current"
-      evse_es_powermeas:
-        value_template: "{{ state_attr('sensor.evse_es', 'powerMeas')  | round(1) }}"
+      evse_eveus_powermeas:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'powerMeas')  | round(1) }}"
         unit_of_measurement: "kW"
         friendly_name: "Power"
-      evse_es_temperature1:
-        value_template: "{{ state_attr('sensor.evse_es', 'temperature1') }}"
+      evse_eveus_temperature1:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'temperature1') }}"
         unit_of_measurement: "°C"
         friendly_name: "Temp of box"
-      evse_es_temperature2:
-        value_template: "{{ state_attr('sensor.evse_es', 'temperature2') }}"
+      evse_eveus_temperature2:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'temperature2') }}"
         unit_of_measurement: "°C"
         friendly_name: "Temp of plug"
-      evse_es_ground:
-        value_template: "{{ state_attr('sensor.evse_es', 'ground') }}"
+      evse_eveus_ground:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'ground') }}"
         friendly_name: "Ground"
-      evse_es_groundctrl:
-        value_template: "{{ state_attr('sensor.evse_es', 'groundCtrl') }}"
+      evse_eveus_groundctrl:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'groundCtrl') }}"
         friendly_name: "Ground control"
-      evse_es_aivoltage:
-        value_template: "{{ state_attr('sensor.evse_es', 'aiVoltage') | round(1) }}"
+      evse_eveus_aivoltage:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'aiVoltage') | round(1) }}"
         unit_of_measurement: "V"
         friendly_name: "Voltage adaptive min"
-      evse_es_sessiontime:
-        value_template: "{{ state_attr('sensor.evse_es', 'sessionTime') }}"
+      evse_eveus_sessiontime:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'sessionTime') }}"
         unit_of_measurement: "s"
         friendly_name: "Session duration"
-      evse_es_sessionenergy:
-        value_template: "{{ state_attr('sensor.evse_es', 'sessionEnergy') | round(3) }}"
+      evse_eveus_sessionenergy:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'sessionEnergy') | round(3) }}"
         unit_of_measurement: "kWh"
         friendly_name: "Session energy"
-      evse_es_totalenergy:
-        value_template: "{{ state_attr('sensor.evse_es', 'totalEnergy') | round(3) }}"
+      evse_eveus_totalenergy:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'totalEnergy') | round(3) }}"
         unit_of_measurement: "kWh"
         friendly_name: "Total energy"
-      evse_es_vbat:
-        value_template: "{{ state_attr('sensor.evse_es', 'vBat')  | round(2) }}"
+      evse_eveus_aistatus:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'aiStatus') }}"
+        friendly_name: "Adaptive mode status"
+      evse_eveus_vbat:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'vBat')  | round(2) }}"
         unit_of_measurement: "V"
-      evse_es_systemtime:
-        value_template: "{{ state_attr('sensor.evse_es', 'systemTime') | int | timestamp_custom('%d.%m.%Y %H:%M:%S', False) }}"
+      evse_eveus_systemtime:
+        value_template: "{{ state_attr('sensor.evse_eveus', 'systemTime') | int | timestamp_custom('%d.%m.%Y %H:%M:%S', False) }}"
         friendly_name: "System time"
 ```
 
@@ -147,4 +149,18 @@ Configuration -> Server Controls
 Press `RESTART` in `Server managementn` section
 
 5. Create dashboards/automation using new sensor entities
-![image](https://user-images.githubusercontent.com/5980725/147565859-ef10c469-1bee-4e78-b85f-e080b9eac392.png)
+
+# Switch example
+```
+switch:
+  - platform: command_line
+    switches:
+      evse_eveus_stop_charging:
+        command_on: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d 'limitsStatus=512'"
+        command_off: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d 'limitsStatus=0'"
+        command_state: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.'"
+        value_template: '{{value_json.limitsStatus == 512 }}'
+        friendly_name: EVSE stop charging
+```
+
+![image](https://user-images.githubusercontent.com/5980725/147608770-54e393a2-9b64-4c03-a57e-85550ee3169b.png)
