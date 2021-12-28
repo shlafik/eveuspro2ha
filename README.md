@@ -12,7 +12,7 @@ I take NO responsibility and/or liability for how you choose to use any of the s
 Replace `{{ EVEUS_IP }}` with your IP, as well as `{{ EVEUS_USER }}` and `{{ EVEUS_PASSWORD }}`.
 Note: ttribute names are based on eveus pro v1.3. You may check full list of attributes with command:
 ```
-curl -u {{ EVEUS_USER }}` and `{{ EVEUS_PASSWORD }} -X POST http://{{ EVEUS_IP }}/main
+curl -u {{ EVEUS_USER }}:{{ EVEUS_PASSWORD }} -X POST http://{{ EVEUS_IP }}/main
 ```
 Add sensor to HA (edit /config/configuration.yaml):
 ```
