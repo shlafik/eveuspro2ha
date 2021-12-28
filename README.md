@@ -10,7 +10,8 @@ I take NO responsibility and/or liability for how you choose to use information 
 1. Add sensor (/config/configuration.yaml)
 
 Replace `{{ EVEUS_IP }}` with your IP, as well as `{{ EVEUS_USER }}` and `{{ EVEUS_PASSWORD }}`.
-Note: ttribute names are based on eveus pro v1.3. You may check full list of attributes with command:
+
+Note: ttribute names are based on eveus pro v1.30. You may check full list of attributes with command:
 ```
 curl -u {{ EVEUS_USER }}:{{ EVEUS_PASSWORD }} -X POST http://{{ EVEUS_IP }}/main
 ```
