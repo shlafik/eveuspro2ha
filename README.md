@@ -159,7 +159,7 @@ switch:
       evse_eveus_stop_charging:
         command_on: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"limitsStatus=$((512^$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))\""
         command_off: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"limitsStatus=$((512^$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))\""
-        command_state: "/bin/echo $((512&$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))"
+        command_state: "echo $((512&$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))"
         value_template: '{{ value == "512" }}'
         friendly_name: EVSE stop charging
 ```
