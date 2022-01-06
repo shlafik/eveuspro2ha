@@ -151,15 +151,16 @@ Press `RESTART` in `Server managementn` section
 5. Create dashboards/automation using new sensor entities
 
 # Switch example
+This example implements Eveus UI interface switch named "Остановить процес заряда"
 ```
 switch:
   - platform: command_line
     switches:
       evse_eveus_stop_charging:
-        command_on: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d 'limitsStatus=512'"
-        command_off: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d 'limitsStatus=0'"
-        command_state: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.'"
-        value_template: '{{value_json.limitsStatus == 512 }}'
+        command_on: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"limitsStatus=$((512^$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))\""
+        command_off: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"limitsStatus=$((512^$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))\""
+        command_state: "/bin/echo $((512&$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))"
+        value_template: '{{ value == "512" }}'
         friendly_name: EVSE stop charging
 ```
 
