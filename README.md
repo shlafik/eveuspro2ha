@@ -272,5 +272,5 @@ entities:
 ![obraz](https://user-images.githubusercontent.com/5980725/167610287-29698c61-8fc1-4a36-b012-8c39f6ff0467.png)
 
 
-Dashboard example
+# Dashboard example
 ![obraz](https://user-images.githubusercontent.com/5980725/167611065-4f47ba0a-0176-4b1f-a20d-7caa61197586.png)
