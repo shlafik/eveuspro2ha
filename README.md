@@ -11,7 +11,7 @@ I take NO responsibility and/or liability for how you choose to use information 
 
 Replace `{{ EVSE_HOST }}` with your IP, as well as `{{ EVSE_USER }}` and `{{ EVSE_PASSWORD }}`.
 
-Note: ttribute names are based on eveus pro v1.30. You may check full list of attributes with command:
+Note: attribute names are based on eveus pro v1.30. You may check full list of attributes with command:
 ```
 curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST http://{{ EVSE_HOST }}/main
 ```
@@ -77,7 +77,30 @@ sensor:
         value_template: "{{ state_attr('sensor.evse_eveus', 'evseEnabled') }}"
         friendly_name: "EVSE Enabled"
       evse_eveus_state:
-        value_template: "{{ state_attr('sensor.evse_eveus', 'state') }}"
+        value_template: >
+          {% set mapper =  {
+            0  : 'No data',
+            1  : 'Ready',
+            2  : 'Waiting',
+            3  : 'Charging',
+            7  : 'Current Leak',
+            8  : 'No Ground',
+            10 : 'Overheat Plug',
+            11 : 'Overheat Relay',
+            12 : 'OverCurrent',
+            13 : 'OverVoltage',
+            14 : 'UnderVoltage',
+            15 : 'Limited By Time',
+            16 : 'Limited By Energy',
+            17 : 'Limited By Money',
+            18 : 'Limited By Schedule1',
+            19 : 'Limited By Schedule2',
+            20 : 'Disabled By User',
+            21 : 'Relay Stuck',
+            22 : 'Limited By AI Mode'
+          } %}
+          {% set state_num = state_attr('sensor.evse_eveus', 'state') %}
+          {{ mapper[state_num] if state_num in mapper else 'Unknown' }}
         friendly_name: "State"
       evse_eveus_currentset:
         value_template: "{{ state_attr('sensor.evse_eveus', 'currentSet') }}"
@@ -108,10 +131,10 @@ sensor:
         unit_of_measurement: "°C"
         friendly_name: "Temp of plug"
       evse_eveus_ground:
-        value_template: "{{ state_attr('sensor.evse_eveus', 'ground') }}"
+        value_template: "{% if state_attr('sensor.evse_eveus', 'ground') == 1 %}Yes{% else %}No{% endif %}"
         friendly_name: "Ground"
       evse_eveus_groundctrl:
-        value_template: "{{ state_attr('sensor.evse_eveus', 'groundCtrl') }}"
+        value_template: "{% if state_attr('sensor.evse_eveus', 'groundCtrl') == 2 %}Yes{% else %}No{% endif %}"
         friendly_name: "Ground control"
       evse_eveus_aivoltage:
         value_template: "{{ state_attr('sensor.evse_eveus', 'aiVoltage') | round(1) }}"
@@ -152,6 +175,8 @@ Press `RESTART` in `Server managementn` section
 
 # Switch example
 This example implements Eveus UI interface switch named "Остановить процес заряда"
+
+add into /config/configuration.yaml
 ```
 switch:
   - platform: command_line
@@ -164,4 +189,88 @@ switch:
         friendly_name: EVSE stop charging
 ```
 
-![image](https://user-images.githubusercontent.com/5980725/147608770-54e393a2-9b64-4c03-a57e-85550ee3169b.png)
+# Current regulator (+/- buttons)
+add into /config/configuration.yaml
+```
+shell_command:
+  evse_current_incr: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"currentSet=$(($(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.currentSet')+1))\""
+  evse_current_decr: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"currentSet=$(($(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.currentSet')-1))\""
+```
+UI
+```
+type: vertical-stack
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: button
+        tap_action:
+          action: call-service
+          service: shell_command.evse_current_decr
+        show_icon: true
+        show_name: true
+        name: EVSE current -
+        icon: mdi:arrow-down-bold-box
+      - type: entity
+        entity: sensor.evse_eveus_currentset
+        icon: mdi:lightning-bolt
+      - type: button
+        tap_action:
+          action: call-service
+          service: shell_command.evse_current_incr
+        show_icon: true
+        show_name: true
+        name: EVSE current +
+        icon: mdi:arrow-up-bold-box
+  - type: horizontal-stack
+    cards:
+      - type: button
+        tap_action:
+          action: toggle
+        entity: switch.evse_eveus_stop_charging
+        icon: mdi:pause-octagon-outline
+      - type: entity
+        entity: sensor.evse_eveus_state
+        icon: mdi:ev-station
+```
+![obraz](https://user-images.githubusercontent.com/5980725/167610181-d41f9cb4-77c5-4954-bc72-de6b5c7ac50c.png)
+
+
+
+# Current regulator (slider)
+
+add into /config/configuration.yaml
+```
+shell_command:
+ evse_current_set: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"currentSet={{ '%02d'|format(states('input_number.evse_eveus_current')|int) }}\""
+
+input_number:
+  evse_eveus_current:
+    min: 6
+    max: 16
+    step: 1
+```
+
+add into /config/automations.yaml
+```
+- id: '1639106027277'
+  alias: 'Set EVEUS EVSE Current'
+  description: ''
+  trigger:
+  - platform: state
+    entity_id: input_number.evse_eveus_current
+  condition: []
+  action:
+    service: shell_command.evse_current_set
+```
+
+UI
+```
+type: entities
+entities:
+  - entity: input_number.evse_eveus_current
+```
+![obraz](https://user-images.githubusercontent.com/5980725/167610287-29698c61-8fc1-4a36-b012-8c39f6ff0467.png)
+
+
+Dashboard example
+![obraz](https://user-images.githubusercontent.com/5980725/167611065-4f47ba0a-0176-4b1f-a20d-7caa61197586.png)
