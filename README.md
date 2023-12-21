@@ -178,15 +178,14 @@ This example implements Eveus UI interface switch named "Остановить п
 
 add into /config/configuration.yaml
 ```
-switch:
-  - platform: command_line
-    switches:
-      evse_eveus_stop_charging:
-        command_on: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"limitsStatus=$((512^$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))\""
-        command_off: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"limitsStatus=$((512^$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))\""
-        command_state: "echo $((512&$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))"
-        value_template: '{{ value == "512" }}'
-        friendly_name: EVSE stop charging
+command_line:
+  - switch:
+      name: EVSE stop charging
+      unique_id: evse_eveus_stop_charging
+      command_on: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"limitsStatus=$((512^$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))\""
+      command_off: "curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST -H 'Content-type: application/x-www-form-urlencoded' 'http://{{ EVSE_HOST }}/pageEvent' -d \"limitsStatus=$((512^$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))\""
+      command_state: "echo $((512&$(curl -s -u {{ EVSE_USER }}:{{ EVSE_PASSWORD }} -X POST 'http://{{ EVSE_HOST }}/main' | jq '.limitsStatus')))"
+      value_template: '{{ value == "512" }}'
 ```
 
 # Current regulator (+/- buttons)
@@ -226,7 +225,7 @@ cards:
       - type: button
         tap_action:
           action: toggle
-        entity: switch.evse_eveus_stop_charging
+        entity: switch.evse_stop_charging
         icon: mdi:pause-octagon-outline
       - type: entity
         entity: sensor.evse_eveus_state
